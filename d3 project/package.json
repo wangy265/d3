@@ -1,6 +1,6 @@
 {
 
-   "name": "d3-project-template",
+   "name": "d3-project",
 
    "version": "0.1.0",
 
@@ -14,13 +14,13 @@
 
    ],
 
-   "homepage": "<project home page>",
+   "homepage": "d3 visualization",
 
    "author": {
 
-     "name": "<your name>",
+     "name": "wangy265",
 
-     "url": "<your url>"
+     "url": "127.0.0.1"
 
    },
 
@@ -28,7 +28,7 @@
 
      "type": "git",
 
-     "url": "<source repo url>"
+     "url": "https://github.com/wangy265/d3.git"
 
    },
 
