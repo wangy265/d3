@@ -36,12 +36,6 @@
 
      "d3":"3.x"
 
-     },
-
-   "devDependencies": {
-
-       "uglify-js": "2.x"
-
-   }
+     }
 
 }
