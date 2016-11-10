@@ -1,0 +1,22 @@
+{
+  "name": "wangyd3",
+  "version": "1.0.0",
+  "description": "learning d3",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wangy265/d3.git"
+  },
+  "keywords": [
+    "d3"
+  ],
+  "author": "wangy265",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wangy265/d3/issues"
+  },
+  "homepage": "https://github.com/wangy265/d3#readme"
+}
