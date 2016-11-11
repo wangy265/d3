@@ -20,22 +20,22 @@ function makeLineChart(dataset, xName, yNames) {
          * */
         if (typeof colorOptions == 'function') {
             return colorOptions
-        } else if (Array.isArray(colorOptions)) {
-            //  If an array is provided, map it to the domain
-            var colorMap = {}, cColor = 0;
-            for (var cName in chart.groupObjs) {
-                colorMap[cName] = colorOptions[cColor];
-                cColor = (cColor + 1) % colorOptions.length;
+            } else if (Array.isArray(colorOptions)) {
+                //  If an array is provided, map it to the domain
+                var colorMap = {}, cColor = 0;
+                for (var cName in chart.groupObjs) {
+                    colorMap[cName] = colorOptions[cColor];
+                    cColor = (cColor + 1) % colorOptions.length;
+                }
+                return function (group) {
+                    return colorMap[group];
+                }
+            } else if (typeof colorOptions == 'object') {
+                // if an object is provided, assume it maps to  the colors
+                return function (group) {
+                    return colorOptions[group];
+                }
             }
-            return function (group) {
-                return colorMap[group];
-            }
-        } else if (typeof colorOptions == 'object') {
-            // if an object is provided, assume it maps to  the colors
-            return function (group) {
-                return colorOptions[group];
-            }
-        }
     }
 
     //Formatter functions for the axes
