@@ -254,102 +254,102 @@ function makeLineChart(dataset, xName, yNames) {
 
     };
 
-    chart.render = function () {
+    // chart.render = function () {
 
-        var yName,
-            cY=null;
+    //     var yName,
+    //         cY=null;
 
-        chart.objs.legend = chart.objs.mainDiv.append('div').attr("class", "legend");
+    //     chart.objs.legend = chart.objs.mainDiv.append('div').attr("class", "legend");
 
-        function toggleSeries(yName) {
-            cY = chart.groupObjs[yName];
-            cY.visible = !cY.visible;
-            if (cY.visible==false) {cY.objs.legend.div.style("opacity","0.3")} else {cY.objs.legend.div.style("opacity","1")}
-            chart.update()
-        }
-        function getToggleFn(series) {
-            return function () {
-                return toggleSeries(series);
-            };
-        }
-        for (yName in chart.groupObjs) {
-            cY = chart.groupObjs[yName];
-            cY.objs.g = chart.objs.g.append("g");
-            cY.objs.line.g = cY.objs.g.append("path")
-                .datum(chart.data)
-                .attr("class", "line")
-                .attr("d", cY.objs.line.series)
-                .style("stroke", colorFunct(yName))
-                .attr("data-series", yName)
-                .on("mouseover", function () {
-                    tooltip.style("display", null);
-                }).on("mouseout", function () {
-                    tooltip.transition().delay(700).style("display", "none");
-                }).on("mousemove", mouseHover);
+    //     function toggleSeries(yName) {
+    //         cY = chart.groupObjs[yName];
+    //         cY.visible = !cY.visible;
+    //         if (cY.visible==false) {cY.objs.legend.div.style("opacity","0.3")} else {cY.objs.legend.div.style("opacity","1")}
+    //         chart.update()
+    //     }
+    //     function getToggleFn(series) {
+    //         return function () {
+    //             return toggleSeries(series);
+    //         };
+    //     }
+    //     for (yName in chart.groupObjs) {
+    //         cY = chart.groupObjs[yName];
+    //         cY.objs.g = chart.objs.g.append("g");
+    //         cY.objs.line.g = cY.objs.g.append("path")
+    //             .datum(chart.data)
+    //             .attr("class", "line")
+    //             .attr("d", cY.objs.line.series)
+    //             .style("stroke", colorFunct(yName))
+    //             .attr("data-series", yName)
+    //             .on("mouseover", function () {
+    //                 tooltip.style("display", null);
+    //             }).on("mouseout", function () {
+    //                 tooltip.transition().delay(700).style("display", "none");
+    //             }).on("mousemove", mouseHover);
 
-            cY.objs.legend = {};
-            cY.objs.legend.div = chart.objs.legend.append('div').on("click",getToggleFn(yName));
-            cY.objs.legend.icon = cY.objs.legend.div.append('div')
-                .attr("class", "series-marker")
-                .style("background-color", colorFunct(yName));
-            cY.objs.legend.text = cY.objs.legend.div.append('p').text(yName);
+    //         cY.objs.legend = {};
+    //         cY.objs.legend.div = chart.objs.legend.append('div').on("click",getToggleFn(yName));
+    //         cY.objs.legend.icon = cY.objs.legend.div.append('div')
+    //             .attr("class", "series-marker")
+    //             .style("background-color", colorFunct(yName));
+    //         cY.objs.legend.text = cY.objs.legend.div.append('p').text(yName);
 
-        }
+    //     }
 
-        //Draw tooltips
-        //Themust be a better way so we don't need a second loop. Issue is draw order so tool tips are on top
-        chart.objs.tooltip = chart.objs.g.append("g").attr("class", "tooltip").style("display", "none");
-        // Year label
-        chart.objs.tooltip.append("text").attr("class", "year").attr("x", 9).attr("y", 7);
-        // Focus line
-        chart.objs.tooltip.append("line").attr("class", "line").attr("y1", 0).attr("y2", chart.height);
+    //     //Draw tooltips
+    //     //Themust be a better way so we don't need a second loop. Issue is draw order so tool tips are on top
+    //     chart.objs.tooltip = chart.objs.g.append("g").attr("class", "tooltip").style("display", "none");
+    //     // Year label
+    //     chart.objs.tooltip.append("text").attr("class", "year").attr("x", 9).attr("y", 7);
+    //     // Focus line
+    //     chart.objs.tooltip.append("line").attr("class", "line").attr("y1", 0).attr("y2", chart.height);
 
-        for (yName in chart.groupObjs) {
-            cY = chart.groupObjs[yName];
-            //Add tooltip elements
-            var tooltip = chart.objs.tooltip.append("g");
-            cY.objs.circle = tooltip.append("circle").attr("r", 5);
-            cY.objs.rect = tooltip.append("rect").attr("x", 8).attr("y","-5").attr("width",22).attr("height",'0.75em');
-            cY.objs.text = tooltip.append("text").attr("x", 9).attr("dy", ".35em").attr("class","value");
-            cY.objs.tooltip = tooltip;
-        }
+    //     for (yName in chart.groupObjs) {
+    //         cY = chart.groupObjs[yName];
+    //         //Add tooltip elements
+    //         var tooltip = chart.objs.tooltip.append("g");
+    //         cY.objs.circle = tooltip.append("circle").attr("r", 5);
+    //         cY.objs.rect = tooltip.append("rect").attr("x", 8).attr("y","-5").attr("width",22).attr("height",'0.75em');
+    //         cY.objs.text = tooltip.append("text").attr("x", 9).attr("dy", ".35em").attr("class","value");
+    //         cY.objs.tooltip = tooltip;
+    //     }
 
-        // Overlay to capture hover
-        chart.objs.g.append("rect")
-            .attr("class", "overlay")
-            .attr("width", chart.width)
-            .attr("height", chart.height)
-            .on("mouseover", function () {
-                chart.objs.tooltip.style("display", null);
-            }).on("mouseout", function () {
-                chart.objs.tooltip.style("display", "none");
-            }).on("mousemove", mouseHover);
+    //     // Overlay to capture hover
+    //     chart.objs.g.append("rect")
+    //         .attr("class", "overlay")
+    //         .attr("width", chart.width)
+    //         .attr("height", chart.height)
+    //         .on("mouseover", function () {
+    //             chart.objs.tooltip.style("display", null);
+    //         }).on("mouseout", function () {
+    //             chart.objs.tooltip.style("display", "none");
+    //         }).on("mousemove", mouseHover);
 
-        return chart;
+    //     return chart;
 
 
 
-        function mouseHover() {
-            var x0 = chart.xScale.invert(d3.mouse(this)[0]), i = chart.bisectYear(dataset, x0, 1), d0 = chart.data[i - 1], d1 = chart.data[i];
-            try {
-                var d = x0 - chart.xFunct(d0) > chart.xFunct(d1) - x0 ? d1 : d0;
-            } catch (e) { return;}
-            var minY = chart.height;
-            var yName, cY;
-            for (yName in chart.groupObjs) {
-                cY = chart.groupObjs[yName];
-                if (cY.visible==false) {continue}
-                //Move the tooltip
-                cY.objs.tooltip.attr("transform", "translate(" + chart.xScale(chart.xFunct(d)) + "," + chart.yScale(cY.yFunct(d)) + ")");
-                //Change the text
-                cY.objs.tooltip.select("text").text(chart.yFormatter(cY.yFunct(d)));
-                minY = Math.min(minY, chart.yScale(cY.yFunct(d)));
-            }
+    //     function mouseHover() {
+    //         var x0 = chart.xScale.invert(d3.mouse(this)[0]), i = chart.bisectYear(dataset, x0, 1), d0 = chart.data[i - 1], d1 = chart.data[i];
+    //         try {
+    //             var d = x0 - chart.xFunct(d0) > chart.xFunct(d1) - x0 ? d1 : d0;
+    //         } catch (e) { return;}
+    //         var minY = chart.height;
+    //         var yName, cY;
+    //         for (yName in chart.groupObjs) {
+    //             cY = chart.groupObjs[yName];
+    //             if (cY.visible==false) {continue}
+    //             //Move the tooltip
+    //             cY.objs.tooltip.attr("transform", "translate(" + chart.xScale(chart.xFunct(d)) + "," + chart.yScale(cY.yFunct(d)) + ")");
+    //             //Change the text
+    //             cY.objs.tooltip.select("text").text(chart.yFormatter(cY.yFunct(d)));
+    //             minY = Math.min(minY, chart.yScale(cY.yFunct(d)));
+    //         }
 
-            chart.objs.tooltip.select(".tooltip .line").attr("transform", "translate(" + chart.xScale(chart.xFunct(d)) + ")").attr("y1", minY);
-            chart.objs.tooltip.select(".tooltip .year").text("Year: " + chart.xFormatter(chart.xFunct(d)));
-        }
+    //         chart.objs.tooltip.select(".tooltip .line").attr("transform", "translate(" + chart.xScale(chart.xFunct(d)) + ")").attr("y1", minY);
+    //         chart.objs.tooltip.select(".tooltip .year").text("Year: " + chart.xFormatter(chart.xFunct(d)));
+    //     }
 
-    };
+    // };
     return chart;
 }
