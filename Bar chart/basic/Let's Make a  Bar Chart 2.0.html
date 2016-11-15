@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	 <head>
+	  <title> Bar Chart </title>
+	  <meta name="generator" content="editplus" />
+	  <meta name="author" content="" />
+	  <meta name="keywords" content="" />
+	  <meta name="description" content="" />
+	 </head>
+
+	<style type="text/css">
+	.chart div {
+	  font: 10px sans-serif;
+	  background-color: steelblue;
+	  text-align: right;
+	  padding: 3px;
+	  margin: 1px;
+	  color: white;
+	}
+	</style>
+
+
+
+ <body>
+	<div class="chart">
+	</div>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script type="text/javascript">
+	var data = [4, 8, 15, 16, 23, 42];
+	d3.select(".chart")
+		.selectAll("div")
+		.data(data)
+		.enter().append("div")
+		.style("width", function(d) { return d * 10 + "px"; })
+		.style("text-align","left")
+		.text(function(d) { return d; })
+		.style("text-align","right");
+</script>
+ </body>
+</html>
