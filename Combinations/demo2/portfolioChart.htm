@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="screen.css">
+  <link href="css.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="font-awesome.css">
+  <script type="text/javascript" src="d3.js"></script>
+  <title>Portfolio selection</title>
+  <meta name="viewport" content="width=device-width">
+  <link rel="alternate" href="http://www.mattlayman.com/feed.xml" title="Matt Layman's Writings" type="atom+xml">
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+</head>
+<body>
+<div id="container">
+  <h1>Portfolio Selection APAC</h1>
+  <div style="position:absolute;width: 300px; margin-left:530px ;margin-top: 10px">
+      <p>
+          <hr/>
+          Please input Risk Free value and click RUN.
+      </p>
+    <div><label>value:</label><input id="datakey" name="datakey" type="text"  /></div>
+    <p>
+      <button  onclick="loadline()"> RUN</button>
+    </p>
+
+    <hr/>
+    <div >
+      <p style="display:inline-block;width:300px;color:#663300">
+        The x-axis in the plot represents 'risk' while the y-axis represents expected return.The theory based on that"Given the return, minimize the risk or given the risk, maximize the return"
+      </p>
+      <p style="display:inline-block;width:300px;color:#663300">
+        According to the data received, we can obtain a series of 'best' portfolio(curve); combined with 'risk-free' value determined by market(intercept on y-axis), the real-best portfolio is shown.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  var height = 500,
+          width = 500,
+          margin = 40,
+          xAxis, yAxis, xAxisLength, yAxisLength;
+
+  var svg = d3.select("#container").append("svg")
+          .attr("class", "axis")
+          .attr("width", width)
+          .attr("height", height);
+
+  var color = d3.scale.category20();
+  var v=200;
+
+  //get the boundary
+
+  var xmax;
+  var ymax;
+  function loadtable(id){
+    console.log(id);
+    var name = id+".csv";
+    console.log(name);
+    d3.csv(name, function(data) {
+      function tabulate(data, columns) {
+        d3.select("body").select("#conmy").remove();
+        var div = d3.select("#container").append("div").attr("id","conmy");
+        div.append("h1").text("Best Portfolio:");
+        var table = div.append("table")
+                .attr("style", "margin-left: 0px,border: 1px solid #ccc;"),
+                thead = table.append("thead"),
+                tbody = table.append("tbody");
+
+        // append the header row
+        thead.append("tr")
+                .selectAll("td")
+                .data(columns)
+                .enter()
+                .append("td")
+                .attr("style", "border: 1px solid #ccc;background:#FFFFE0;")
+                .text(function(column) { return column; });
+
+        // create a row for each object in the data
+        var rows = tbody.selectAll("tr")
+                .data(data)
+                .enter()
+                .append("tr")
+                .attr("style", function(data,i){
+                  if(i%2==0){
+                    return "border:1px solid #ccc;"
+                  }else{
+                    return "border:1px solid #ccc; background:#FFFFE0;";
+                  }
+                })
+
+        // create a cell in each row for each column
+        var cells = rows.selectAll("td")
+                .data(function(row) {
+                  return columns.map(function(column) {
+                    return {column: column, value: row[column]};
+                  });
+                })
+                .enter()
+                .append("td")
+                .attr("style", function(row){
+                  if(row/2==0){
+                    return "border:1px solid #ccc"
+                  }else{
+                    return "border:1px solid #ccc";
+                  }
+                })
+                .html(function(d) { return d.value; });
+
+        return table;
+      }
+
+// render the table;
+
+      var peopleTable = tabulate(data, ["Sites", "Australia","Bangladesh","Hongkong","Indonesia","Malaysia","Myanmar","New Zealand","Pakistan"]);
+    });
+
+  }
+  d3.csv("maxcoor.csv",function(data){
+
+      console.log(data);
+
+      xmax = +data[0].xmax;
+      ymax = +data[0].ymax;
+
+      console.log(xmax);
+      console.log(ymax);
+
+      x = d3.scale.linear() // <-A
+              .domain([0,xmax])
+              .range([0, width - 2*margin]);
+      y = d3.scale.linear() // <-A
+              .domain([0,ymax])
+              .range([height - 2*margin,  0]);
+
+      function renderXAxis(){
+          xAxis = d3.svg.axis()
+                  .scale(x)
+                  .tickSubdivide(1)
+                  .orient("bottom");
+
+          svg.append("g")
+                  .attr("class", "x-axis")
+                  .attr("transform", function(){
+                      return "translate(" + margin + "," + (height - margin) + ")";
+                  })
+                  .call(xAxis);
+      }
+
+      function renderYAxis(){
+          yAxis = d3.svg.axis()
+                  .scale(y)
+                  .tickSubdivide(1)
+                  .orient("left");
+
+          svg.append("g")
+                  .attr("class", "y-axis")
+                  .attr("transform", function(){
+                      return "translate(" + margin + "," + margin + ")";
+                  })
+                  .call(yAxis);
+      }
+
+      renderYAxis();
+      renderXAxis();
+
+  });
+  function loadline(){
+      d3.csv("tanport.csv",function(data){
+
+      x = d3.scale.linear() // <-A
+              .domain([0,xmax])
+              .range([0, width - 2*margin]);
+      y = d3.scale.linear() // <-A
+              .domain([0,ymax])
+              .range([height - 2*margin,  0]);
+
+      var line = d3.svg.line() // <-D
+              .x(function(d){return x(d.xcoor);})
+              .y(function(d){return y(d.ycoor);});
+
+      d3.select("body").select("#myl").remove();
+
+      var pointdata = $("input#datakey").val();
+          if(pointdata==""){
+              return;
+          }
+       v = parseFloat(pointdata);
+          if(v>200){
+              alert("Give me another Risk value");
+              return;
+          }
+      var dataset =[];
+      var t_xcoor = data[0].xcoor;
+      var t_ycoor = data[0].ycoor;
+
+      var k =(t_ycoor-v)/ t_xcoor;
+      var point1 = {};
+      point1.xcoor = 0;
+      point1.ycoor = v;
+      dataset.push(point1);
+
+      var point2={};
+      point2.xcoor = t_xcoor;
+      point2.ycoor = t_ycoor;
+      dataset.push(point2);
+
+      var y_max = xmax*k+v;
+      var x_max = (ymax-v)/k;
+      var point3={}
+      if(y_max<ymax){
+        point3.xcoor=xmax;
+        point3.ycoor=k*xmax+v;
+      }else{
+        point3.xcoor=(ymax-v)/k;
+        point3.ycoor=ymax;
+      }
+      dataset.push(point3);
+      console.log(k);
+      console.log(dataset);
+      svg.append("g").attr("id","myl")
+              .attr("transform", function(){
+                return "translate(" + margin + "," + margin + ")";
+              })
+              .selectAll("path")
+              .data(dataset)
+              .enter()
+              .append("path") // <-E
+              .attr("class", "line")
+              .attr("d", line(dataset))
+              .attr("style", "fill: none;stroke: #999999; stroke-width: 1.5px;"); // <-F
+
+    });
+      d3.csv("names.csv",function(data){
+          if(v>200) return;
+          console.log(data);
+          x = d3.scale.linear() // <-A
+                  .domain([0,xmax])
+                  .range([0, width - 2*margin]);
+          y = d3.scale.linear() // <-A
+                  .domain([0,ymax])
+                  .range([height - 2*margin,  0]);
+          svg.append("g")
+                  .attr("transform", function(){
+                      return "translate(" + margin + "," + margin + ")";
+                  }).selectAll("circle")
+                  .data(data)
+                  .enter()
+                  .append("circle")
+                  .on("mouseover",function(d){
+                      console.log(d.name);
+                      var label = svg.append("g")
+                              .attr("id", "labelname")
+                              .attr("transform",  "translate(" + x(d.xcoor-0.5) + "," + y(d.ycoor) + ")");
+
+                      label.append("text")
+                              .attr("dy", ".35em")
+                              .text( d.name+"/"+d.erP);
+
+
+                  }).on("mouseout",function(d){
+                      d3.select("body").select("#labelname").remove();
+                  })
+                  .attr("cx", function(d) {
+                      return x(d.xcoor*2);
+                  })
+                  .attr("cy", function(d) {
+                      return y(d.ycoor*2);
+                  })
+                  .attr("r", function(d) {
+                      return d.erP/9;
+                  })
+                  .transition()
+                  .duration(1000)
+                  .attr("cx", function(d) {
+                      return x(d.xcoor);
+                  })
+                  .attr("cy", function(d) {
+                      return y(d.ycoor);
+                  }).attr("fill",function(d,i){
+					  if(d.ID==1){
+						  return "#87CEFA";
+						  
+					  }else if(d.ID==2){
+						  return "#6495ED"
+					  }else{
+						  return "#B0C4DE";
+					  }
+             
+          });
+      })
+      d3.csv("coordinates.csv",function(data) {
+          if(v>200) return;
+          console.log(data);
+          x = d3.scale.linear() // <-A
+                  .domain([0, xmax])
+                  .range([0, width - 2 * margin]);
+          y = d3.scale.linear() // <-A
+                  .domain([0, ymax])
+                  .range([height - 2 * margin, 0]);
+          svg.append("g")
+                  .attr("transform", function () {
+                      return "translate(" + margin + "," + margin + ")";
+                  }).selectAll("circle")
+                  .data(data)
+                  .enter()
+                  .append("circle")
+                  .on("mouseover",function(d,i){
+                      var id = d.ID;
+					  if(d.xcoor==1.629){
+					  var label = svg.append("g")
+                              .attr("id", "labelname")
+                              .attr("transform",  "translate(" + x(d.xcoor) + "," + y(d.ycoor) + ")");
+
+                      label.append("text")
+                              .attr("dy", ".35em")
+                              .text("Weighted by Sales");
+						loadtable(id);
+					  }else{
+					    loadtable(id);
+					  }
+                     
+                  }).on("mouseout",function(d){
+                      d3.select("body").select("#labelname").remove();
+                  })
+                  .attr("cx", function (d) {
+                      return x(Math.random(d.xcoor));
+                  })
+                  .attr("cy", function (d) {
+                      return y(Math.random(d.ycoor));
+                  })
+                  .attr("r", function (d) {
+					  console.log(d);
+					  if(d.xcoor==1.629){
+						return 8
+					  }else{
+						return 4;
+					  }
+                      
+                  })
+                  .transition()
+                  .duration(1000)
+                  .attr("cx", function (d) {
+                      return x(d.xcoor);
+                  })
+                  .attr("cy", function (d) {
+                      return y(d.ycoor);
+                  }).attr("fill", function(d){
+						if(d.xcoor==1.629){
+						return "#ff7f0e";
+						}else{
+						return "#666600";
+						}
+				  });
+
+      });
+      d3.csv("tanport.csv",function(data){
+          if(v>200) return;
+          console.log(data);
+          x = d3.scale.linear() // <-A
+                  .domain([0,xmax])
+                  .range([0, width - 2*margin]);
+          y = d3.scale.linear() // <-A
+                  .domain([0,ymax])
+                  .range([height - 2*margin,  0]);
+          svg.append("g")
+                  .attr("transform", function(){
+                      return "translate(" + margin + "," + margin + ")";
+                  }).selectAll("circle")
+                  .data(data)
+                  .enter()
+                  .append("circle")
+                  .attr("cx", function(d) {
+                      return x(Math.random(d.xcoor));
+                  })
+                  .attr("cy", function(d) {
+                      return y(Math.random(d.ycoor));
+                  })
+                  .attr("r", function(d) {
+                      return 4;
+                  })
+                  .transition()
+                  .duration(1000)
+                  .attr("cx", function(d) {
+                      return x(d.xcoor);
+                  })
+                  .attr("cy", function(d) {
+                      return y(d.ycoor);
+                  }).attr("fill","#cc9966"
+          );
+      });
+
+  }
+
+
+
+</script>
+
+</body></html>
+<!-- handrolled for excellence -->
